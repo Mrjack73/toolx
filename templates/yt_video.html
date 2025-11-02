@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Premium YouTube Downloader</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif}
+body{background:#0b0f1c;color:#fff;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px}
+.container{width:100%;max-width:650px;background:#121a2e;border:1px solid rgba(255,255,255,0.1);padding:40px;border-radius:20px;box-shadow:0 0 25px rgba(138,91,255,0.15)}
+.title{text-align:center;font-size:32px;font-weight:700;margin-bottom:10px}
+.title span{color:#8a5bff}
+.sub{opacity:.7;margin-bottom:35px;text-align:center}
+.input-box{width:100%;background:#0f1629;border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:15px 18px;font-size:15px;color:#fff;outline:none;transition:.2s}
+.input-box:focus{border:1px solid #8a5bff;box-shadow:0 0 8px rgba(138,91,255,0.5)}
+.btn{margin-top:20px;width:100%;padding:15px;border:none;border-radius:14px;font-size:16px;font-weight:600;background:#8a5bff;color:#fff;cursor:pointer;transition:.2s}
+.btn:hover{background:#7045ff;box-shadow:0 0 12px rgba(138,91,255,0.6)}
+.note{text-align:center;margin-top:20px;font-size:12px;opacity:.6}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="title">Youtube Video <span>Downloader</span></div>
+  <div class="sub">Paste your YouTube link below to download</div>
+
+  <form method="POST">
+    <input class="input-box" type="text" name="yt_v" placeholder="Enter YouTube link">
+    <button class="btn" type="submit">Download</button>
+  </form>
+
+  <div class="note">Fast • Secure • No Watermark</div>
+</div>
+
+</body>
+</html>
