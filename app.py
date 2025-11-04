@@ -1,29 +1,19 @@
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 from pytubefix import YouTube
 from rembg import remove
 from PIL import Image
 import instaloader
-import cloudinary
-import cloudinary.uploader
-
-# ---------- CONFIGURE CLOUDINARY ----------
-import os
-
-cloudinary.config(
-    cloud_name=os.getenv("CLOUD_NAME"),
-    api_key=os.getenv("API_KEY"),
-    api_secret=os.getenv("API_SECRET")
-)
 
 app = Flask(__name__)
 
-# ---------- HOME ----------
+# --------- HOME ----------
 @app.route("/")
 def home():
     return render_template("index.html")
 
-# ---------- YOUTUBE VIDEO DOWNLOAD ----------
+
+# --------- YOUTUBE VIDEO DOWNLOAD ----------
 @app.route("/video", methods=["GET", "POST"])
 def video():
     if request.method == "POST":
@@ -33,23 +23,15 @@ def video():
         try:
             yt = YouTube(yt_video_link)
             stream = yt.streams.get_highest_resolution()
-            temp_path = "/tmp"
+            temp_path = "/tmp"  # Render writable directory
             file_path = stream.download(output_path=temp_path)
-
-            # Upload to Cloudinary
-            upload_result = cloudinary.uploader.upload_large(
-                file_path, resource_type="video", folder="toolx_videos"
-            )
-            cloud_url = upload_result["secure_url"]
-
-            return render_template("yt_video.html", message="✅ Download ready!", link=cloud_url)
-
+            return send_file(file_path, as_attachment=True, download_name=f"{yt.title}.mp4")
         except Exception as e:
             return render_template("yt_video.html", message=f"❌ Error: {str(e)}")
-
     return render_template("yt_video.html", message="")
 
-# ---------- YOUTUBE AUDIO DOWNLOAD ----------
+
+# --------- YOUTUBE AUDIO DOWNLOAD ----------
 @app.route("/audio", methods=["GET", "POST"])
 def audio():
     if request.method == "POST":
@@ -61,19 +43,13 @@ def audio():
             audio_stream = yt_audio.streams.filter(only_audio=True).first()
             temp_path = "/tmp"
             audio_file = audio_stream.download(output_path=temp_path)
-
-            # Upload to Cloudinary (audio treated as video resource)
-            upload_result = cloudinary.uploader.upload_large(
-                audio_file, resource_type="video", folder="toolx_audio"
-            )
-            cloud_url = upload_result["secure_url"]
-
-            return render_template("yt_audio.html", message="✅ Audio ready!", link=cloud_url)
+            return send_file(audio_file, as_attachment=True, download_name=f"{yt_audio.title}.mp3")
         except Exception as e:
             return render_template("yt_audio.html", message=f"❌ Error: {str(e)}")
     return render_template("yt_audio.html", message="")
 
-# ---------- INSTAGRAM REEL DOWNLOAD ----------
+
+# --------- INSTAGRAM REEL DOWNLOAD ----------
 @app.route("/reel", methods=["GET", "POST"])
 def insta():
     if request.method == "POST":
@@ -94,22 +70,18 @@ def insta():
             post = instaloader.Post.from_shortcode(L.context, shortcode)
             L.download_post(post, target="Reel")
 
-            # Find and upload the reel
             for file in os.listdir(download_folder):
                 if file.endswith(".mp4"):
                     file_path = os.path.join(download_folder, file)
-                    upload_result = cloudinary.uploader.upload_large(
-                        file_path, resource_type="video", folder="toolx_reels"
-                    )
-                    cloud_url = upload_result["secure_url"]
-                    return render_template("reel.html", message="✅ Reel ready!", link=cloud_url)
+                    return send_file(file_path, as_attachment=True, download_name="Reel.mp4")
 
             return render_template("reel.html", message="❌ Reel not found or private.")
         except Exception as e:
             return render_template("reel.html", message=f"❌ Error: {str(e)}")
     return render_template("reel.html", message="")
 
-# ---------- IMAGE BACKGROUND REMOVER ----------
+
+# --------- IMAGE BACKGROUND REMOVER ----------
 @app.route("/remove_bg", methods=["GET", "POST"])
 def removeimg():
     if request.method == "POST":
@@ -120,19 +92,13 @@ def removeimg():
 
             output_path = "/tmp/BgRemovedimg.png"
             output.save(output_path)
-
-            # Upload to Cloudinary (as image)
-            upload_result = cloudinary.uploader.upload(
-                output_path, resource_type="image", folder="toolx_removed_bg"
-            )
-            cloud_url = upload_result["secure_url"]
-
-            return render_template("bg-remove.html", message="✅ Background removed!", link=cloud_url)
+            return send_file(output_path, as_attachment=True)
         except Exception as e:
             return render_template("bg-remove.html", message=f"❌ Error: {str(e)}")
     return render_template("bg-remove.html", message="")
 
-# ---------- RUN APP ----------
+
+# --------- RUN APP ----------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
