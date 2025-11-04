@@ -27,8 +27,6 @@ Flask (Python) — Web Framework
 PyTubeFix — YouTube Video/Audio Downloader
 
 Instaloader — Instagram Reels Downloader
-http://127.0.0.1:5000
-
 
 Rembg + Pillow — AI Background Remover
 
