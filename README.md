@@ -38,23 +38,23 @@ HTML, CSS (Custom UI) — Modern Interface
 Follow these steps to set up ToolX on your local machine 👇
 
 1️⃣ Clone the Repository
-git clone https://github.com/<your-username>/toolx.git
+```git clone https://github.com/<your-username>/toolx.git```
 
 2️⃣ Navigate to the Project Folder
-cd toolx
+```cd toolx```
 
 3️⃣ Install Dependencies
 
 Make sure you have Python 3.10+ installed.
 Then run:
 
-pip install -r requirements.txt
+```pip install -r requirements.txt```
 
 4️⃣ Run the App
-python app.py
+```python app.py```
 
 5️⃣ Open in Browser
 
 Once the server starts, open your browser and visit:
 
-http://127.0.0.1:5000
+```http://127.0.0.1:5000```
