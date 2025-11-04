@@ -8,10 +8,12 @@ import cloudinary
 import cloudinary.uploader
 
 # ---------- CONFIGURE CLOUDINARY ----------
+import os
+
 cloudinary.config(
-    cloud_name="Toolx",  # replace with your cloud name
-    api_key="569951559739562",  # your API key
-    api_secret="TPmd3JzmYyvyhgCgn0aCAPS0J74"  # your API secret
+    cloud_name=os.getenv("CLOUD_NAME"),
+    api_key=os.getenv("API_KEY"),
+    api_secret=os.getenv("API_SECRET")
 )
 
 app = Flask(__name__)
