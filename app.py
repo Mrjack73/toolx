@@ -1,3 +1,4 @@
+
 import os
 from flask import Flask, render_template, request, send_file
 from pytubefix import YouTube
@@ -23,11 +24,13 @@ def video():
         try:
             yt = YouTube(yt_video_link)
             stream = yt.streams.get_highest_resolution()
-            temp_path = "/tmp"  # Render writable directory
-            file_path = stream.download(output_path=temp_path)
-            return send_file(file_path, as_attachment=True, download_name=f"{yt.title}.mp4")
+            Downloads = os.path.join(os.path.expanduser("~"), "Downloads")
+            video_path = stream.download(output_path=Downloads)
+            return send_file(video_path,as_attachment=True,download_name=f"{yt.title}.mp3")
+
         except Exception as e:
             return render_template("yt_video.html", message=f"❌ Error: {str(e)}")
+
     return render_template("yt_video.html", message="")
 
 
@@ -41,8 +44,8 @@ def audio():
         try:
             yt_audio = YouTube(yt_audio_link)
             audio_stream = yt_audio.streams.filter(only_audio=True).first()
-            temp_path = "/tmp"
-            audio_file = audio_stream.download(output_path=temp_path)
+            Downloads = os.path.join(os.path.expanduser("~"), "Downloads")
+            audio_file = audio_stream.download(output_path=Downloads)
             return send_file(audio_file, as_attachment=True, download_name=f"{yt_audio.title}.mp3")
         except Exception as e:
             return render_template("yt_audio.html", message=f"❌ Error: {str(e)}")
@@ -57,12 +60,14 @@ def insta():
         if not insta_url:
             return render_template("reel.html", message="❌ Please enter an Instagram reel link.")
         try:
-            download_folder = "/tmp/Instagram_Reels"
-            os.makedirs(download_folder, exist_ok=True)
+            # Save to user's Downloads folder
+            Downloads = os.path.join(os.path.expanduser("~"), "Downloads")
+            os.makedirs(Downloads, exist_ok=True)
+
             shortcode = insta_url.split("/")[-2]
 
             L = instaloader.Instaloader(
-                dirname_pattern=download_folder,
+                dirname_pattern=Downloads,
                 download_video_thumbnails=False,
                 download_comments=False,
                 save_metadata=False
@@ -70,15 +75,18 @@ def insta():
             post = instaloader.Post.from_shortcode(L.context, shortcode)
             L.download_post(post, target="Reel")
 
-            for file in os.listdir(download_folder):
+            for file in os.listdir(Downloads):
                 if file.endswith(".mp4"):
-                    file_path = os.path.join(download_folder, file)
-                    return send_file(file_path, as_attachment=True, download_name="Reel.mp4")
+                    file_path = os.path.join(Downloads, file)
+                    # ✅ Immediately send the reel to the browser for download
+                    return send_file(file_path, as_attachment=True, download_name="Instagram_Reel.mp4")
 
             return render_template("reel.html", message="❌ Reel not found or private.")
         except Exception as e:
             return render_template("reel.html", message=f"❌ Error: {str(e)}")
+
     return render_template("reel.html", message="")
+
 
 
 # --------- IMAGE BACKGROUND REMOVER ----------
@@ -88,13 +96,24 @@ def removeimg():
         try:
             image = request.files["image"]
             input_img = Image.open(image)
+
+            # Process image (remove background)
             output = remove(input_img)
 
-            output_path = "/tmp/BgRemovedimg.png"
+            # Save to user's Downloads folder
+            Downloads = os.path.join(os.path.expanduser("~"), "Downloads",)
+            os.makedirs(Downloads, exist_ok=True)
+
+            # Save output file
+            output_path = os.path.join(Downloads, "BgRemovedimg.png")
             output.save(output_path)
-            return send_file(output_path, as_attachment=True)
+
+            # ✅ Send file for instant browser download
+            return send_file(output_path, as_attachment=True, download_name="BgRemovedimg.png")
+
         except Exception as e:
             return render_template("bg-remove.html", message=f"❌ Error: {str(e)}")
+
     return render_template("bg-remove.html", message="")
 
 
